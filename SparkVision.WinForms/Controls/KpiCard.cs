@@ -3,7 +3,7 @@ namespace SparkVision.WinForms.Controls;
 public class KpiCard : Panel
 {
     private readonly Label _titre = new() { Font = new Font("Segoe UI", 9), AutoSize = true };
-    private readonly Label _valeur = new() { Font = new Font("Segoe UI", 22, FontStyle.Bold), AutoSize = true };
+    private readonly Label _valeur = new() { Font = new Font("Segoe UI", 18, FontStyle.Bold), AutoSize = true };
     private readonly Label _unite = new() { Font = new Font("Segoe UI", 9), AutoSize = true };
     private readonly Color _normalBack = Color.White;
     private readonly Color _normalText = Color.FromArgb(30, 35, 40);
@@ -72,7 +72,8 @@ public class KpiCard : Panel
     private void Positionner()
     {
         _titre.Location = new Point(10, 8);
-        _valeur.Location = new Point(10, 30);
-        _unite.Location = new Point(10, Math.Max(58, Height - 30));
+        _valeur.Location = new Point(10, 28);
+        var uniteY = Math.Min(_valeur.Bottom + 2, Math.Max(8, Height - _unite.Height - 8));
+        _unite.Location = new Point(10, uniteY);
     }
 }

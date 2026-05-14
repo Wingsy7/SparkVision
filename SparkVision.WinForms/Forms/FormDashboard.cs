@@ -135,7 +135,7 @@ public class FormDashboard : Form
             ColumnCount = 1,
             Padding = new Padding(8)
         };
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 150));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 210));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 70));
@@ -154,14 +154,17 @@ public class FormDashboard : Form
         var row = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
-            ColumnCount = 6,
-            RowCount = 1
+            ColumnCount = 3,
+            RowCount = 2,
+            GrowStyle = TableLayoutPanelGrowStyle.FixedSize
         };
 
-        for (var i = 0; i < 6; i++)
+        for (var i = 0; i < 3; i++)
         {
-            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f / 6));
+            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f / 3));
         }
+        row.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
+        row.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
 
         _kpis = new Dictionary<string, KpiCard>
         {
@@ -173,10 +176,12 @@ public class FormDashboard : Form
             ["RSE_MONTH"] = new KpiCard("Total annuel RSE", Color.FromArgb(39, 174, 96)),
         };
 
+        var index = 0;
         foreach (var kpi in _kpis.Values)
         {
             kpi.Dock = DockStyle.Fill;
-            row.Controls.Add(kpi);
+            row.Controls.Add(kpi, index % 3, index / 3);
+            index++;
         }
 
         return row;
