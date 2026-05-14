@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sparkvision-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${SPARKVISION_POSTGRES_DB:-sparkvision}
+      POSTGRES_USER: ${SPARKVISION_POSTGRES_USER:-sparkvision_user}
+      POSTGRES_PASSWORD: ${SPARKVISION_POSTGRES_PASSWORD:-SparkVision123!}
+      TZ: Europe/Paris
+    ports:
+      - "${SPARKVISION_POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - sparkvision_pgdata:/var/lib/postgresql/data
+      - ./database/postgres/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/postgres/02_import_csv.sql:/docker-entrypoint-initdb.d/02_import_csv.sql:ro
+      - ./database/postgres/03_views.sql:/docker-entrypoint-initdb.d/03_views.sql:ro
+      - ./database/postgres/demo_queries.sql:/demo/demo_queries.sql:ro
+      - ./SparkVision.WinForms/Data:/docker-entrypoint-initdb.d/data:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SPARKVISION_POSTGRES_USER:-sparkvision_user} -d ${SPARKVISION_POSTGRES_DB:-sparkvision}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  sparkvision_pgdata:

@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.log
+.env
+sparkvision.db*
+logs/
+publish/
+TestResults/
