@@ -375,7 +375,6 @@ public class FormDashboard : Form
             ChargerKpis();
             ChargerTechnicien();
             ChargerRse();
-            ChargerJournalier();
             MettreAJourStatut();
         }
         catch (Exception ex)
