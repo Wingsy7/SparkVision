@@ -55,6 +55,12 @@ public class FormDashboard : Form
         Font = new Font("Segoe UI", 11, FontStyle.Bold),
         TextAlign = ContentAlignment.MiddleLeft
     };
+    private readonly Label _lblJourTitre = new()
+    {
+        Dock = DockStyle.Fill,
+        Font = new Font("Segoe UI", 11, FontStyle.Bold),
+        TextAlign = ContentAlignment.MiddleLeft
+    };
     private readonly DataGridView _gridRse = new()
     {
         Dock = DockStyle.Fill,
@@ -70,15 +76,17 @@ public class FormDashboard : Form
     };
     private readonly ObservableCollection<DateTimePoint> _serieTech = new();
     private readonly ObservableCollection<DateTimePoint> _serieAnomalies = new();
+    private readonly ObservableCollection<double> _serieJournaliere = new();
 
     private Dictionary<string, KpiCard> _kpis = new();
     private CartesianChart _chartRse = null!;
+    private CartesianChart _chartJour = null!;
     private int _joursTechnicien = 7;
     private List<TechnicienPointModel> _donneesTechAffichees = new();
 
     public FormDashboard()
     {
-        Text = "SparkVision - Dashboard Énergétique";
+        Text = "SparkVision - Dashboard Energetique";
         ChargerIconeFenetre();
         WindowState = FormWindowState.Maximized;
         Font = new Font("Segoe UI", 10);
@@ -93,17 +101,24 @@ public class FormDashboard : Form
         var tabs = new TabControl { Dock = DockStyle.Fill };
         var tabTech = new TabPage("Technicien - Diagnostic");
         var tabRse = new TabPage("RSE - Bilan mensuel");
+        var tabJour = new TabPage("Vue journaliere");
 
         tabTech.Controls.Add(BuildLayoutTechnicien());
         tabRse.Controls.Add(BuildLayoutRse());
+        tabJour.Controls.Add(BuildLayoutJournalier());
 
         tabs.TabPages.Add(tabTech);
         tabs.TabPages.Add(tabRse);
+        tabs.TabPages.Add(tabJour);
         tabs.SelectedIndexChanged += (_, _) =>
         {
             if (tabs.SelectedTab == tabRse)
             {
                 ChargerRse();
+            }
+            else if (tabs.SelectedTab == tabJour)
+            {
+                ChargerJournalier();
             }
         };
 
@@ -289,6 +304,51 @@ public class FormDashboard : Form
         return panel;
     }
 
+    private Panel BuildLayoutJournalier()
+    {
+        var panel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(8) };
+        var layout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 2
+        };
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
+        layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+        layout.Controls.Add(_lblJourTitre, 0, 0);
+        layout.Controls.Add(BuildChartJournalier(), 0, 1);
+        panel.Controls.Add(layout);
+        return panel;
+    }
+
+    private CartesianChart BuildChartJournalier()
+    {
+        _chartJour = new CartesianChart
+        {
+            Dock = DockStyle.Fill,
+            TooltipPosition = LiveChartsCore.Measure.TooltipPosition.Top
+        };
+        _chartJour.Series = new ISeries[]
+        {
+            new ColumnSeries<double>
+            {
+                Values = _serieJournaliere,
+                Name = "Total journalier (kWh)",
+                Fill = new SolidColorPaint(new SKColor(39, 174, 96))
+            }
+        };
+        _chartJour.XAxes = new[]
+        {
+            new Axis
+            {
+                LabelsRotation = 15
+            }
+        };
+        _chartJour.YAxes = new[] { new Axis { Name = "kWh" } };
+        return _chartJour;
+    }
+
     private Panel BuildEnergyRow()
     {
         var row = new FlowLayoutPanel
@@ -315,6 +375,7 @@ public class FormDashboard : Form
             ChargerKpis();
             ChargerTechnicien();
             ChargerRse();
+            ChargerJournalier();
             MettreAJourStatut();
         }
         catch (Exception ex)
@@ -435,6 +496,38 @@ public class FormDashboard : Form
         _lblRseResume.Text =
             $"Bilan RSE par poste - {data.First().Mois} a {data.Last().Mois} | total annuel {totalAnnuel:N1} kWh | {BuildTransitionText(data)}";
         _chartRse.Update();
+    }
+
+    private void ChargerJournalier()
+    {
+        var data = _service.GetAgregationJournaliere(30);
+        _serieJournaliere.Clear();
+        foreach (var point in data)
+        {
+            _serieJournaliere.Add(point.Valeur);
+        }
+
+        _chartJour.XAxes = new[]
+        {
+            new Axis
+            {
+                Labels = data.Select(p => p.Horodatage.ToString("dd/MM", CultureInfo.InvariantCulture)).ToArray(),
+                LabelsRotation = 15
+            }
+        };
+        _chartJour.YAxes = new[] { new Axis { Name = "kWh" } };
+
+        if (data.Count == 0)
+        {
+            _lblJourTitre.Text = "Agregation journaliere - aucune donnee";
+            return;
+        }
+
+        var total = data.Sum(p => p.Valeur);
+        var moyenne = data.Average(p => p.Valeur);
+        _lblJourTitre.Text =
+            $"Agregation journaliere - {data.First().Horodatage:dd/MM/yyyy} au {data.Last().Horodatage:dd/MM/yyyy} | total {total:N1} kWh | moyenne {moyenne:N1} kWh/jour";
+        _chartJour.Update();
     }
 
     private static double GetPoste(RseMoisModel mois, string poste) =>

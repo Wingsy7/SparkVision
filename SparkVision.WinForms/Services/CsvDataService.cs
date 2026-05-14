@@ -6,6 +6,8 @@ namespace SparkVision.WinForms.Services;
 
 public class CsvDataService
 {
+    private static readonly string LogPath = Path.Combine(AppContext.BaseDirectory, "sparkvision.log");
+
     private readonly string _dataDir;
     private readonly string _dbPath;
     private readonly string _connectionString;
@@ -62,6 +64,36 @@ public class CsvDataService
         return points
             .Select(p => p with { Anomalie = p.Valeur > seuil })
             .ToList();
+    }
+
+    public List<TechnicienPointModel> GetAgregationJournaliere(int jours = 30)
+    {
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT Jour, Total
+            FROM (
+                SELECT date(Horodatage) AS Jour, SUM(Valeur) AS Total
+                FROM TechnicianReadings
+                GROUP BY date(Horodatage)
+                ORDER BY Jour DESC
+                LIMIT $jours
+            )
+            ORDER BY Jour;
+            """;
+        command.Parameters.AddWithValue("$jours", Math.Max(1, jours));
+
+        var points = new List<TechnicienPointModel>();
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            points.Add(new TechnicienPointModel(
+                DateTime.ParseExact(reader.GetString(0), "yyyy-MM-dd", CultureInfo.InvariantCulture),
+                reader.GetDouble(1),
+                false));
+        }
+
+        return points;
     }
 
     public List<RseMoisModel> GetRse()
@@ -121,15 +153,18 @@ public class CsvDataService
     {
         using var connection = OpenConnection();
         CreateSchema(connection);
+        Log("Verification base SQLite");
 
         if (CountRows(connection, "TechnicianReadings") == 0)
         {
-            ImportTechnician(connection, Path.Combine(_dataDir, "technician_dataset.csv"));
+            var imported = ImportTechnician(connection, Path.Combine(_dataDir, "technician_dataset.csv"));
+            Log($"Import technicien : {imported} lignes");
         }
 
         if (CountRows(connection, "RseReadings") == 0)
         {
-            ImportRse(connection, Path.Combine(_dataDir, "rse_dataset.csv"));
+            var imported = ImportRse(connection, Path.Combine(_dataDir, "rse_dataset.csv"));
+            Log($"Import RSE : {imported} lignes");
         }
     }
 
@@ -173,13 +208,15 @@ public class CsvDataService
         return (long)command.ExecuteScalar()!;
     }
 
-    private static void ImportTechnician(SqliteConnection connection, string csvPath)
+    private static int ImportTechnician(SqliteConnection connection, string csvPath)
     {
         if (!File.Exists(csvPath))
         {
-            return;
+            Log($"Import technicien impossible : fichier absent {csvPath}");
+            return 0;
         }
 
+        var imported = 0;
         using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
@@ -216,24 +253,28 @@ public class CsvDataService
             horodatageParam.Value = ToDbDate(horodatage);
             valeurParam.Value = valeur;
             command.ExecuteNonQuery();
+            imported++;
         }
 
         transaction.Commit();
+        return imported;
     }
 
-    private static void ImportRse(SqliteConnection connection, string csvPath)
+    private static int ImportRse(SqliteConnection connection, string csvPath)
     {
         if (!File.Exists(csvPath))
         {
-            return;
+            Log($"Import RSE impossible : fichier absent {csvPath}");
+            return 0;
         }
 
         var lines = File.ReadAllLines(csvPath);
         if (lines.Length <= 1)
         {
-            return;
+            return 0;
         }
 
+        var imported = 0;
         var headers = lines[0].Split(',');
         var postes = new Dictionary<string, string>
         {
@@ -280,10 +321,24 @@ public class CsvDataService
                 posteParam.Value = libelle;
                 valeurParam.Value = value;
                 command.ExecuteNonQuery();
+                imported++;
             }
         }
 
         transaction.Commit();
+        return imported;
+    }
+
+    private static void Log(string message)
+    {
+        var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | {message}";
+        File.AppendAllText(LogPath, line + Environment.NewLine);
+
+        var lines = File.ReadAllLines(LogPath);
+        if (lines.Length > 500)
+        {
+            File.WriteAllLines(LogPath, lines.TakeLast(300));
+        }
     }
 
     private static string ToDbDate(DateTime value) =>

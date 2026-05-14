@@ -58,6 +58,16 @@ SELECT
 FROM windowed w
 CROSS JOIN stats s;
 
+CREATE OR REPLACE VIEW v_technician_daily_totals AS
+SELECT
+    horodatage::date AS jour,
+    sum(valeur_kwh)::numeric(12, 3) AS total_kwh,
+    avg(valeur_kwh)::numeric(10, 3) AS moyenne_horaire_kwh,
+    count(*) AS nb_releves
+FROM technician_readings
+GROUP BY horodatage::date
+ORDER BY jour;
+
 CREATE OR REPLACE VIEW v_kpi_summary AS
 WITH bounds AS (
     SELECT max(horodatage)::date AS max_day

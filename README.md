@@ -10,6 +10,7 @@ Une base PostgreSQL dockerisee est aussi fournie comme bonus d'industrialisation
 - `SparkVision.WinForms/Data/technician_dataset.csv` : releves horaires en kWh pour la vue technicien.
 - `SparkVision.WinForms/Data/rse_dataset.csv` : bilan mensuel par poste pour la vue RSE.
 - `sparkvision.db` : base SQLite creee automatiquement a cote de l'executable au premier lancement.
+- `sparkvision.log` : journal applicatif genere automatiquement a cote de l'executable, avec purge au-dela de 500 lignes.
 - `docker-compose.sql.yml` : PostgreSQL dockerise pour montrer l'automatisation SQL.
 - `database/postgres` : schema, import CSV, vues KPI/RSE/anomalies et requetes demo.
 - `scripts` : commandes PowerShell pour lancer la demo et la base Docker.
@@ -50,14 +51,20 @@ Pour personnaliser les identifiants, copie `.env.example` vers `.env` puis modif
 
 - Onglet `Technicien - Diagnostic` : KPI avec alertes couleur, filtre `1 jour / 7 jours / 30 jours`, seuil d'anomalie configurable, export CSV, courbe horaire avec infobulles et points rouges pour les anomalies.
 - Onglet `RSE - Bilan mensuel` : total annuel, indicateur de transition energetique, barres empilees par mois, tableau detaille, ligne total en gras et surlignage du mois le plus consommateur.
+- Onglet `Vue journaliere` : aggregation par jour sur les 30 derniers jours, total et moyenne journaliere.
+
+## Architecture
+
+La version de demonstration utilise une architecture WinForms -> SQLite pour obtenir un dashboard standalone, plus simple a deployer et plus fiable en soutenance. La couche PostgreSQL Docker ajoute une preuve d'industrialisation : creation de schema, import automatise des CSV et vues SQL pour les KPI, les anomalies et les agregations.
 
 ## Demo orale conseillee
 
 1. Lancer `.\scripts\lancer-demo.ps1`.
 2. Montrer le seuil d'anomalie : passer de `2.0` a `1.5`, les points rouges augmentent.
 3. Changer la periode `1 jour`, `7 jours`, `30 jours`.
-4. Passer sur l'onglet RSE : total annuel, mois max en orange, ligne total en gras, fleche de transition.
-5. En bonus, lancer `.\scripts\start-docker-sql.ps1 -Reset` puis `.\scripts\show-sql-demo.ps1` pour montrer l'import SQL automatise.
+4. Passer sur `Vue journaliere` pour montrer l'agregation simple par jour.
+5. Passer sur l'onglet RSE : total annuel, mois max en orange, ligne total en gras, fleche de transition.
+6. En bonus, lancer `.\scripts\start-docker-sql.ps1 -Reset` puis `.\scripts\show-sql-demo.ps1` pour montrer l'import SQL automatise.
 
 ## Publication
 
