@@ -379,7 +379,10 @@ public class FormDashboard : Form
         }
         catch (Exception ex)
         {
-            _lblStatus.Text = $"Erreur chargement CSV : {ex.Message}";
+            _lblStatus.Text = $"Erreur chargement : {ex.Message}";
+            File.AppendAllText(
+                Path.Combine(AppContext.BaseDirectory, "sparkvision.log"),
+                $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | ERREUR : {ex.Message}{Environment.NewLine}");
         }
     }
 

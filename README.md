@@ -4,6 +4,11 @@ Application Windows Forms .NET 10 pour analyser des donnees de consommation ener
 
 Une base PostgreSQL dockerisee est aussi fournie comme bonus d'industrialisation : elle importe les memes CSV, cree les tables SQL, les seuils KPI et des vues de demonstration.
 
+## Aperçu
+
+![Dashboard Technicien](docs/screenshot-tech.png)
+![Dashboard RSE](docs/screenshot-rse.png)
+
 ## Contenu
 
 - `SparkVision.WinForms` : application principale.
