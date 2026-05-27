@@ -45,6 +45,7 @@ $DbName = Get-SparkVisionSetting -Name "SPARKVISION_POSTGRES_DB" -DefaultValue "
 $DbUser = Get-SparkVisionSetting -Name "SPARKVISION_POSTGRES_USER" -DefaultValue "sparkvision_user"
 $DbPassword = Get-SparkVisionSetting -Name "SPARKVISION_POSTGRES_PASSWORD" -DefaultValue "SparkVision123!"
 $DbPort = Get-SparkVisionSetting -Name "SPARKVISION_POSTGRES_PORT" -DefaultValue "5433"
+$ApiPort = Get-SparkVisionSetting -Name "SPARKVISION_API_PORT" -DefaultValue "8080"
 
 Push-Location $Root
 try {
@@ -85,6 +86,7 @@ try {
     Write-Host ""
     Write-Host "Base SQL prete."
     Write-Host "Connexion: Host=localhost;Port=$DbPort;Database=$DbName;Username=$DbUser;Password=$DbPassword"
+    Write-Host "API Swagger: http://127.0.0.1:$ApiPort/swagger"
     Write-Host "Requetes demo: .\scripts\show-sql-demo.ps1"
 }
 finally {

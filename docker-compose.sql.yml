@@ -1,4 +1,16 @@
 services:
+  api:
+    build:
+      context: .
+      dockerfile: SparkVision.Api/Dockerfile
+    container_name: sparkvision-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      TZ: Europe/Paris
+    ports:
+      - "${SPARKVISION_API_PORT:-8080}:8080"
+
   db:
     image: postgres:16-alpine
     container_name: sparkvision-postgres

@@ -1,8 +1,8 @@
 using System.Globalization;
 using Microsoft.Data.Sqlite;
-using SparkVision.WinForms.Models;
+using SparkVision.Data.Models;
 
-namespace SparkVision.WinForms.Services;
+namespace SparkVision.Data.Services;
 
 public class CsvDataService
 {
@@ -12,10 +12,10 @@ public class CsvDataService
     private readonly string _dbPath;
     private readonly string _connectionString;
 
-    public CsvDataService()
+    public CsvDataService(string? dataDir = null, string? databasePath = null)
     {
-        _dataDir = Path.Combine(AppContext.BaseDirectory, "Data");
-        _dbPath = Path.Combine(AppContext.BaseDirectory, "sparkvision.db");
+        _dataDir = dataDir ?? Path.Combine(AppContext.BaseDirectory, "Data");
+        _dbPath = databasePath ?? Path.Combine(AppContext.BaseDirectory, "sparkvision.db");
         _connectionString = $"Data Source={_dbPath}";
         InitializeDatabase();
     }
@@ -347,3 +347,4 @@ public class CsvDataService
     private static DateTime ParseDbDate(string value) =>
         DateTime.ParseExact(value, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 }
+

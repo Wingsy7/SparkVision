@@ -1,6 +1,7 @@
 using SparkVision.WinForms.Controls;
+using SparkVision.Data.Models;
+using SparkVision.Data.Services;
 using SparkVision.WinForms.Models;
-using SparkVision.WinForms.Services;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;

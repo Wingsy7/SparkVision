@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/.vs/
+publish/
+TestResults/
+logs/
+*.log
+*.zip
+rendu_*/
+tp_osint_*/
+sparkvision.db*
+.env
