@@ -33,7 +33,9 @@ public class KpiCard : Panel
 
     public void Mettre(double? valeur, string unite, double? warning = null, double? danger = null)
     {
-        _valeur.Text = valeur.HasValue ? $"{valeur.Value:N1}" : "-";
+        _valeur.Text = valeur.HasValue
+            ? string.IsNullOrWhiteSpace(unite) ? $"{valeur.Value:N0}" : $"{valeur.Value:N1}"
+            : "-";
         _unite.Text = unite;
         AppliquerEtat(valeur, warning, danger);
     }

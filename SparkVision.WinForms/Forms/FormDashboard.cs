@@ -87,7 +87,7 @@ public class FormDashboard : Form
 
     public FormDashboard()
     {
-        Text = "SparkVision - Dashboard Energetique";
+        Text = "SparkVision - Dashboard Énergétique";
         ChargerIconeFenetre();
         WindowState = FormWindowState.Maximized;
         Font = new Font("Segoe UI", 10);
@@ -102,7 +102,7 @@ public class FormDashboard : Form
         var tabs = new TabControl { Dock = DockStyle.Fill };
         var tabTech = new TabPage("Technicien - Diagnostic");
         var tabRse = new TabPage("RSE - Bilan mensuel");
-        var tabJour = new TabPage("Vue journaliere");
+        var tabJour = new TabPage("Vue journalière");
 
         tabTech.Controls.Add(BuildLayoutTechnicien());
         tabRse.Controls.Add(BuildLayoutRse());
@@ -169,7 +169,7 @@ public class FormDashboard : Form
 
         _kpis = new Dictionary<string, KpiCard>
         {
-            ["LAST_HOUR"] = new KpiCard("Derniere heure", Color.FromArgb(55, 138, 221)),
+            ["LAST_HOUR"] = new KpiCard("Dernière heure", Color.FromArgb(55, 138, 221)),
             ["DAY_TOTAL"] = new KpiCard("Total 24h", Color.FromArgb(55, 138, 221)),
             ["WEEK_TOTAL"] = new KpiCard("Total 7j", Color.FromArgb(55, 138, 221)),
             ["WEEK_PEAK"] = new KpiCard("Pic 7j", Color.FromArgb(55, 138, 221)),
@@ -198,7 +198,7 @@ public class FormDashboard : Form
         };
         row.Controls.Add(new Label
         {
-            Text = "Periode :",
+            Text = "Période :",
             AutoSize = true,
             Font = new Font("Segoe UI", 10, FontStyle.Bold),
             Margin = new Padding(0, 6, 8, 0)
@@ -216,13 +216,13 @@ public class FormDashboard : Form
             };
             ChargerKpis();
             ChargerTechnicien();
-            _lblStatus.Text = $"Periode technicien : {_cmbPeriode.SelectedItem}";
+            _lblStatus.Text = $"Période technicien : {_cmbPeriode.SelectedItem}";
         };
         row.Controls.Add(_cmbPeriode);
 
         row.Controls.Add(new Label
         {
-            Text = "Seuil anomalies :",
+            Text = "Seuil d'anomalies :",
             AutoSize = true,
             Font = new Font("Segoe UI", 10, FontStyle.Bold),
             Margin = new Padding(24, 6, 8, 0)
@@ -230,7 +230,7 @@ public class FormDashboard : Form
         row.Controls.Add(_numSeuil);
         row.Controls.Add(new Label
         {
-            Text = "x ecart-type",
+            Text = "x écart-type",
             AutoSize = true,
             Margin = new Padding(4, 6, 16, 0)
         });
@@ -238,7 +238,7 @@ public class FormDashboard : Form
         {
             ChargerKpis();
             ChargerTechnicien();
-            _lblStatus.Text = $"Seuil anomalies : {_numSeuil.Value:N1}x ecart-type";
+            _lblStatus.Text = $"Seuil d'anomalies : {_numSeuil.Value:N1}x écart-type";
         };
 
         _btnExport.Click += (_, _) => ExporterTechnicien();
@@ -435,7 +435,7 @@ public class FormDashboard : Form
         }
         else
         {
-            _lblTechTitre.Text = "Consommation horaire - aucune donnee pour cette periode";
+            _lblTechTitre.Text = "Consommation horaire - aucune donnée pour cette période";
         }
     }
 
@@ -444,7 +444,7 @@ public class FormDashboard : Form
         var data = _service.GetRse();
         if (data.Count == 0)
         {
-            _lblRseResume.Text = "Aucune donnee RSE chargee.";
+            _lblRseResume.Text = "Aucune donnée RSE chargée.";
             _gridRse.DataSource = null;
             _chartRse.Series = Array.Empty<ISeries>();
             return;
@@ -504,7 +504,7 @@ public class FormDashboard : Form
 
         var totalAnnuel = data.Sum(m => m.Postes.Values.Sum());
         _lblRseResume.Text =
-            $"Bilan RSE par poste - {data.First().Mois} a {data.Last().Mois} | total annuel {totalAnnuel:N1} kWh | {BuildTransitionText(data)}";
+            $"Bilan RSE par poste - {data.First().Mois} à {data.Last().Mois} | total annuel {totalAnnuel:N1} kWh | {BuildTransitionText(data)}";
         _chartRse.Update();
     }
 
@@ -529,14 +529,14 @@ public class FormDashboard : Form
 
         if (data.Count == 0)
         {
-            _lblJourTitre.Text = "Agregation journaliere - aucune donnee";
+            _lblJourTitre.Text = "Agrégation journalière - aucune donnée";
             return;
         }
 
         var total = data.Sum(p => p.Valeur);
         var moyenne = data.Average(p => p.Valeur);
         _lblJourTitre.Text =
-            $"Agregation journaliere - {data.First().Horodatage:dd/MM/yyyy} au {data.Last().Horodatage:dd/MM/yyyy} | total {total:N1} kWh | moyenne {moyenne:N1} kWh/jour";
+            $"Agrégation journalière - {data.First().Horodatage:dd/MM/yyyy} au {data.Last().Horodatage:dd/MM/yyyy} | total {total:N1} kWh | moyenne {moyenne:N1} kWh/jour";
         _chartJour.Update();
     }
 
@@ -615,7 +615,7 @@ public class FormDashboard : Form
     {
         if (_donneesTechAffichees.Count == 0)
         {
-            MessageBox.Show("Aucune donnee technicien a exporter.", "SparkVision", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Aucune donnée technicien à exporter.", "SparkVision", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
@@ -634,7 +634,7 @@ public class FormDashboard : Form
         lignes.AddRange(_donneesTechAffichees.Select(p =>
             $"{p.Horodatage:yyyy-MM-dd HH:mm:ss};{p.Valeur.ToString(CultureInfo.InvariantCulture)};{p.Anomalie}"));
         File.WriteAllLines(dialog.FileName, lignes, Encoding.UTF8);
-        _lblStatus.Text = $"Export CSV cree : {dialog.FileName}";
+        _lblStatus.Text = $"Export CSV créé : {dialog.FileName}";
     }
 
     private void ChargerIconeFenetre()
@@ -651,7 +651,7 @@ public class FormDashboard : Form
         var dernier = data.LastOrDefault();
         if (dernier is null)
         {
-            return "Transition energetique : aucune donnee";
+            return "Transition énergétique : aucune donnée";
         }
 
         var dernierMois = DateTime.ParseExact(dernier.Mois + "-01", "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -664,8 +664,8 @@ public class FormDashboard : Form
 
         var precedent = data.Count >= 2 ? data[^2] : null;
         return precedent is null
-            ? "Transition energetique : comparaison indisponible"
-            : BuildEvolutionText("mois precedent", dernier, precedent);
+            ? "Transition énergétique : comparaison indisponible"
+            : BuildEvolutionText("mois précédent", dernier, precedent);
     }
 
     private static string BuildEvolutionText(string reference, RseMoisModel courant, RseMoisModel precedent)
@@ -674,11 +674,11 @@ public class FormDashboard : Form
         var precedentTotal = precedent.Postes.Values.Sum();
         if (precedentTotal <= 0)
         {
-            return $"Transition energetique : reference {reference} indisponible";
+            return $"Transition énergétique : référence {reference} indisponible";
         }
 
         var variation = (courantTotal - precedentTotal) / precedentTotal * 100.0;
         var fleche = variation <= 0 ? "↓" : "↑";
-        return $"Transition energetique : {fleche} {Math.Abs(variation):N1}% vs {reference}";
+        return $"Transition énergétique : {fleche} {Math.Abs(variation):N1}% vs {reference}";
     }
 }
