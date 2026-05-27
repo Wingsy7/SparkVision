@@ -263,13 +263,15 @@ public class FormDashboard : Form
                 Stroke = new SolidColorPaint(new SKColor(55, 138, 221), 3),
                 Fill = null
             },
-            new ScatterSeries<DateTimePoint>
+            new LineSeries<DateTimePoint>
             {
                 Values = _serieAnomalies,
                 Name = "Anomalies",
                 GeometrySize = 12,
-                Fill = new SolidColorPaint(SKColors.Red),
-                Stroke = new SolidColorPaint(SKColors.DarkRed, 2)
+                GeometryFill = new SolidColorPaint(SKColors.Red),
+                GeometryStroke = new SolidColorPaint(SKColors.DarkRed, 2),
+                Stroke = null,
+                Fill = null
             }
         };
         chart.XAxes = new[]
