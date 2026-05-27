@@ -62,14 +62,7 @@ Pour personnaliser les identifiants, copie `.env.example` vers `.env` puis modif
 
 La version de demonstration utilise une architecture WinForms -> SQLite pour obtenir un dashboard standalone, plus simple a deployer et plus fiable en soutenance. La couche PostgreSQL Docker ajoute une preuve d'industrialisation : creation de schema, import automatise des CSV et vues SQL pour les KPI, les anomalies et les agregations.
 
-## Demo orale conseillee
 
-1. Lancer `.\scripts\lancer-demo.ps1`.
-2. Montrer le seuil d'anomalie : passer de `2.0` a `1.5`, les points rouges augmentent.
-3. Changer la periode `1 jour`, `7 jours`, `30 jours`.
-4. Passer sur `Vue journaliere` pour montrer l'agregation simple par jour.
-5. Passer sur l'onglet RSE : total annuel, mois max en orange, ligne total en gras, fleche de transition.
-6. En bonus, lancer `.\scripts\start-docker-sql.ps1 -Reset` puis `.\scripts\show-sql-demo.ps1` pour montrer l'import SQL automatise.
 
 ## Publication
 
