@@ -109,15 +109,6 @@ docker-compose.sql.yml -> API REST + PostgreSQL de demonstration SQL
 
 Cette separation donne une version plus professionnelle : interface desktop, API REST documentee, couche metier partagee, logs applicatifs et demo Docker.
 
-## Demo orale conseillee
-
-1. Lancer `.\scripts\lancer-demo.ps1`.
-2. Montrer le seuil d'anomalie : passer de `2.0` a `1.5`, les points rouges augmentent.
-3. Changer la periode `1 jour`, `7 jours`, `30 jours`.
-4. Passer sur l'onglet RSE : total annuel, mois max en orange, ligne total en gras, fleche de transition.
-5. Passer sur `Vue journaliere` pour montrer l'agregation 30 jours.
-6. Lancer `.\scripts\start-api.ps1` et montrer Swagger.
-7. En bonus, lancer `.\scripts\start-docker-sql.ps1 -Reset` puis `.\scripts\show-sql-demo.ps1` pour montrer l'import SQL automatise.
 
 ## Publication
 
