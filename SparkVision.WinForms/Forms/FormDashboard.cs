@@ -123,8 +123,20 @@ public class FormDashboard : Form
             }
         };
 
-        Controls.Add(tabs);
-        Controls.Add(_lblStatus);
+        var root = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 2
+        };
+        root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, _lblStatus.Height));
+
+        _lblStatus.Dock = DockStyle.Fill;
+        root.Controls.Add(tabs, 0, 0);
+        root.Controls.Add(_lblStatus, 0, 1);
+        Controls.Add(root);
     }
 
     private TableLayoutPanel BuildLayoutTechnicien()
