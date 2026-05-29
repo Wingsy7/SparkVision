@@ -67,6 +67,22 @@ api.MapGet("/technicien/jours", (CsvDataService service, int jours = 30) =>
 })
 .WithName("GetDailyTechnicienTotals");
 
+api.MapGet("/energie", (CsvDataService service, int jours = 7, double seuil = 2.0) =>
+{
+    var validation = ValidateJours(jours) ?? ValidateSeuil(seuil);
+    if (validation is not null)
+    {
+        return validation;
+    }
+
+    var points = service.GetTechnicien(jours, seuil)
+        .OrderBy(p => p.Horodatage)
+        .ToList();
+
+    return Results.Ok(CalculerEnergieTrapeze(points, jours, seuil));
+})
+.WithName("GetEnergieTrapeze");
+
 api.MapGet("/rse", (CsvDataService service) => Results.Ok(service.GetRse()))
     .WithName("GetRseReadings");
 
@@ -107,6 +123,47 @@ static IResult? ValidateSeuil(double seuil)
         : null;
 }
 
+static EnergieResponse CalculerEnergieTrapeze(
+    IReadOnlyList<TechnicienPointModel> points,
+    int jours,
+    double seuil)
+{
+    if (points.Count < 2)
+    {
+        return new EnergieResponse(
+            jours,
+            seuil,
+            "trapeze",
+            points.Count,
+            null,
+            null,
+            0,
+            0);
+    }
+
+    var totalKwh = 0.0;
+    for (var i = 1; i < points.Count; i++)
+    {
+        var heures = (points[i].Horodatage - points[i - 1].Horodatage).TotalHours;
+        if (heures <= 0)
+        {
+            continue;
+        }
+
+        totalKwh += (points[i - 1].Valeur + points[i].Valeur) / 2.0 * heures;
+    }
+
+    return new EnergieResponse(
+        jours,
+        seuil,
+        "trapeze",
+        points.Count,
+        points.First().Horodatage,
+        points.Last().Horodatage,
+        Math.Round(totalKwh, 4),
+        Math.Round(totalKwh * 1000.0, 2));
+}
+
 public record RseMonthTotalResponse(
     string Mois,
     double TotalKwh,
@@ -118,3 +175,15 @@ public record RseSummaryResponse(
     RseMonthTotalResponse? MoisMinimum,
     RseMonthTotalResponse? MoisMaximum,
     IReadOnlyList<RseMonthTotalResponse> Mois);
+
+public record EnergieResponse(
+    int Jours,
+    double Seuil,
+    string Methode,
+    int NombrePoints,
+    DateTime? Debut,
+    DateTime? Fin,
+    double EnergieKwh,
+    double EnergieWh);
+
+public partial class Program;

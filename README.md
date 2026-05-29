@@ -2,7 +2,7 @@
 
 Application Windows Forms .NET 10 pour analyser des donnees de consommation energetique. Les CSV sont importes automatiquement dans une base SQLite locale pour garder une demo simple et autonome.
 
-Une API REST ASP.NET Core avec Swagger expose les memes KPI et bilans via une couche `SparkVision.Data` partagee. Une base PostgreSQL dockerisee est aussi fournie comme bonus d'industrialisation : elle importe les memes CSV, cree les tables SQL, les seuils KPI et des vues de demonstration.
+Une base PostgreSQL dockerisee est aussi fournie comme bonus d'industrialisation : elle importe les memes CSV, cree les tables SQL, les seuils KPI et des vues de demonstration.
 
 ## Apercu
 
@@ -22,15 +22,14 @@ Une API REST ASP.NET Core avec Swagger expose les memes KPI et bilans via une co
 
 - `SparkVision.WinForms` : application principale.
 - `SparkVision.Api` : API REST ASP.NET Core avec Swagger.
-- `SparkVision.Data` : couche partagee de chargement CSV, SQLite, logs et calculs metier.
+- `SparkVision.Data` : couche partagee de chargement CSV, SQLite et calculs metier.
 - `docs` : captures d'ecran utilisees dans le README.
 - `SparkVision.WinForms/Data/technician_dataset.csv` : releves horaires en kWh pour la vue technicien.
 - `SparkVision.WinForms/Data/rse_dataset.csv` : bilan mensuel par poste pour la vue RSE.
 - `sparkvision.db` : base SQLite creee automatiquement a cote de l'executable au premier lancement.
-- `sparkvision.log` : journal applicatif genere automatiquement a cote de l'executable, avec purge au-dela de 500 lignes.
-- `docker-compose.sql.yml` : API REST et PostgreSQL dockerises pour montrer l'automatisation SQL.
+- `docker-compose.sql.yml` : PostgreSQL dockerise pour montrer l'automatisation SQL.
 - `database/postgres` : schema, import CSV, vues KPI/RSE/anomalies et requetes demo.
-- `scripts` : commandes PowerShell pour lancer la demo, l'API et la base Docker.
+- `scripts` : commandes PowerShell pour lancer la demo et la base Docker.
 
 ## Lancer l'application
 
@@ -45,6 +44,8 @@ Commande directe equivalente :
 $env:DOTNET_ROLL_FORWARD='Major'
 dotnet run --project SparkVision.WinForms\SparkVision.WinForms.csproj
 ```
+
+Si l'API est disponible sur `http://127.0.0.1:8080`, WinForms consomme les endpoints REST. Si l'API n'est pas lancee, l'application bascule automatiquement sur SQLite local pour garder une demo autonome. Pour utiliser l'API lancee par `start-api.ps1`, configure `SPARKVISION_API_URL=http://127.0.0.1:5085` avant de lancer WinForms.
 
 ## Lancer l'API REST
 
@@ -66,6 +67,7 @@ Endpoints principaux :
 - `GET /api/kpis?seuil=2`
 - `GET /api/technicien?jours=7&seuil=2`
 - `GET /api/technicien/jours?jours=30`
+- `GET /api/energie?jours=7&seuil=2`
 - `GET /api/rse`
 - `GET /api/rse/resume`
 
@@ -97,7 +99,6 @@ Pour personnaliser les identifiants, copie `.env.example` vers `.env` puis modif
 
 - Onglet `Technicien - Diagnostic` : KPI avec alertes couleur, filtre `1 jour / 7 jours / 30 jours`, seuil d'anomalie configurable, export CSV, courbe horaire avec infobulles et points rouges pour les anomalies.
 - Onglet `RSE - Bilan mensuel` : total annuel, indicateur de transition energetique, barres empilees par mois, tableau detaille, ligne total en gras et surlignage du mois le plus consommateur.
-- Onglet `Vue journaliere` : aggregation par jour sur les 30 derniers jours, total et moyenne journaliere.
 
 ## Architecture
 
@@ -107,8 +108,16 @@ SparkVision.Api       -> SparkVision.Data -> CSV + SQLite locale
 docker-compose.sql.yml -> API REST + PostgreSQL de demonstration SQL
 ```
 
-Cette separation donne une version plus professionnelle : interface desktop, API REST documentee, couche metier partagee, logs applicatifs et demo Docker.
+Cette separation donne une version plus professionnelle : interface desktop, API REST documentee, couche metier partagee et demo Docker.
 
+## Demo orale conseillee
+
+1. Lancer `.\scripts\lancer-demo.ps1`.
+2. Montrer le seuil d'anomalie : passer de `2.0` a `1.5`, les points rouges augmentent.
+3. Changer la periode `1 jour`, `7 jours`, `30 jours`.
+4. Passer sur l'onglet RSE : total annuel, mois max en orange, ligne total en gras, fleche de transition.
+5. Lancer `.\scripts\start-api.ps1` et montrer Swagger.
+6. En bonus, lancer `.\scripts\start-docker-sql.ps1 -Reset` puis `.\scripts\show-sql-demo.ps1` pour montrer l'import SQL automatise.
 
 ## Publication
 

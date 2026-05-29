@@ -1,7 +1,7 @@
 using SparkVision.WinForms.Controls;
 using SparkVision.Data.Models;
-using SparkVision.Data.Services;
 using SparkVision.WinForms.Models;
+using SparkVision.WinForms.Services;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
@@ -16,7 +16,7 @@ namespace SparkVision.WinForms.Forms;
 
 public class FormDashboard : Form
 {
-    private readonly CsvDataService _service = new();
+    private readonly DashboardDataProvider _service = new();
     private readonly Label _lblStatus = new()
     {
         Dock = DockStyle.Bottom,
@@ -608,7 +608,7 @@ public class FormDashboard : Form
     {
         var status = _service.GetStatus();
         _lblStatus.Text =
-            $"DB OK {Path.GetFileName(status.DatabasePath)} | {status.TechnicianCount:N0} releves technicien | {status.RseCount:N0} lignes RSE | maj {DateTime.Now:HH:mm:ss}";
+            $"{_service.SourceLabel} | {status.TechnicianCount:N0} relevés technicien | {status.RseCount:N0} lignes RSE | maj {DateTime.Now:HH:mm:ss}";
     }
 
     private void ExporterTechnicien()

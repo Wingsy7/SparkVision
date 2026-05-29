@@ -204,6 +204,7 @@ CREATE INDEX IF NOT EXISTS IX_RseReadings_Mois ON RseReadings(Mois);
 | GET /api/kpis | seuil (0.1–10) | 6 indicateurs KPI |
 | GET /api/technicien | jours (1–365), seuil (0.1–10) | Relevés + anomalies |
 | GET /api/technicien/jours | jours (1–365) | Agrégation journalière |
+| GET /api/energie | jours (1–365), seuil (0.1–10) | Énergie calculée en Wh par intégration trapèze |
 | GET /api/rse | — | Bilan mensuel complet |
 | GET /api/rse/resume | — | Résumé annuel min/max |
 
