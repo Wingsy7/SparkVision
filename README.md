@@ -45,7 +45,7 @@ $env:DOTNET_ROLL_FORWARD='Major'
 dotnet run --project SparkVision.WinForms\SparkVision.WinForms.csproj
 ```
 
-Si l'API est disponible sur `http://127.0.0.1:8080`, WinForms consomme les endpoints REST. Si l'API n'est pas lancee, l'application bascule automatiquement sur SQLite local pour garder une demo autonome. Pour utiliser l'API lancee par `start-api.ps1`, configure `SPARKVISION_API_URL=http://127.0.0.1:5085` avant de lancer WinForms.
+Si l'API est disponible sur `http://127.0.0.1:5085`, WinForms consomme les endpoints REST. Si l'API n'est pas lancee, l'application bascule automatiquement sur SQLite local pour garder une demo autonome. Pour utiliser l'API Docker exposee sur `8080`, configure `SPARKVISION_API_URL=http://127.0.0.1:8080` avant de lancer WinForms.
 
 ## Lancer l'API REST
 

@@ -94,7 +94,7 @@ public sealed class DashboardDataProvider : IDisposable
         var value = Environment.GetEnvironmentVariable("SPARKVISION_API_URL");
         if (string.IsNullOrWhiteSpace(value))
         {
-            value = "http://127.0.0.1:8080";
+            value = "http://127.0.0.1:5085";
         }
 
         return value.TrimEnd('/') + "/";
